@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class Sack<T extends Entity> {
+public class Sack<T> {
 
     public enum Status {
         SUCCESS,
@@ -113,7 +113,7 @@ public class Sack<T extends Entity> {
         return commit(obj, null);
     }
 
-    public static <T extends Entity> Sack<T> open(final Class<T> entity, final File path) {
+    public static <T> Sack<T> open(final Class<T> entity, final File path) {
         return new Sack<T>(entity, path);
     }
 
