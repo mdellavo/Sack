@@ -16,8 +16,8 @@ public class Sack<T extends Entity> {
         ERROR
     }
 
-    public interface Listener {
-        void onResult(Status status, Entity obj);
+    public interface Listener<T> {
+        void onResult(Status status, T obj);
     }
 
     private final Class<T> mClass;
@@ -30,7 +30,7 @@ public class Sack<T extends Entity> {
         mPath = path;
     }
 
-    public void load(Listener listener) {
+    public void load(Listener<T> listener) {
 
         final AtomicFile file = new AtomicFile(mPath);
 
@@ -42,7 +42,7 @@ public class Sack<T extends Entity> {
         }
     }
 
-    public void commit(final T obj, final Listener listener) {
+    public void commit(final T obj, final Listener<T> listener) {
         final AtomicFile file = new AtomicFile(mPath);
         FileOutputStream str = null;
         try {
