@@ -104,7 +104,7 @@ public class Sack<T> {
             }
         };
 
-        task.execute();
+        task.execute(obj);
 
         return task;
     }
