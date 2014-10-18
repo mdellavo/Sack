@@ -32,7 +32,7 @@ public class Sack<T> {
         mPath = path;
     }
 
-    private Pair<Status, T> doLoad() {
+    public Pair<Status, T> doLoad() {
 
         final AtomicFile file = new AtomicFile(mPath);
 
