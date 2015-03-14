@@ -68,7 +68,7 @@ public class Sack<T> {
         return load(null);
     }
 
-    private Pair<Status, T> doCommit(final T obj) {
+    public Pair<Status, T> doCommit(final T obj) {
         final AtomicFile file = new AtomicFile(mPath);
         FileOutputStream str = null;
         try {
