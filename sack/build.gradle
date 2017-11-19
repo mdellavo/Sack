@@ -15,8 +15,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 2
-        versionName "0.2"
+        versionCode 3
+        versionName "0.2.1"
     }
 
     lintOptions {
@@ -40,7 +40,7 @@ install {
                 packaging 'aar'
                 groupId 'org.quuux.sack'
                 artifactId 'sack'
-                version '0.2'
+                version '0.2.1'
 
                 licenses {
                     license {
@@ -75,9 +75,9 @@ bintray {
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/mdellavo/Sack.git'
         version {
-            name = '0.2'
+            name = '0.2.1'
             desc = 'A simple data store for Android'
-            vcsTag = '0.2'
+            vcsTag = '0.2.1'
             released  = new Date()
         }
     }

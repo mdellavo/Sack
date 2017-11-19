@@ -36,13 +36,13 @@ public class Sack<T> {
 
     private final Gson mGson;
 
-    private Sack(final Gson gson, final Class<T> klass, final File path) {
+    protected Sack(final Gson gson, final Class<T> klass, final File path) {
         mGson = gson;
         mClass = klass;
         mPath = path;
     }
 
-    private Pair<Status, T> doLoad() {
+    public Pair<Status, T> doLoad() {
 
         final AtomicFile file = new AtomicFile(mPath);
         try {
@@ -73,7 +73,7 @@ public class Sack<T> {
         return out.toString();
     }
 
-    private AsyncTask<Void, Void, Pair<Status, T>> load(final Listener<T> listener) {
+    public AsyncTask<Void, Void, Pair<Status, T>> load(final Listener<T> listener) {
 
         @SuppressLint("StaticFieldLeak") final AsyncTask<Void, Void, Pair<Status, T>>  task = new AsyncTask<Void, Void, Pair<Status, T>>() {
 
@@ -98,7 +98,7 @@ public class Sack<T> {
         return load(null);
     }
 
-    private Pair<Status, T> doCommit(final T obj) {
+    public Pair<Status, T> doCommit(final T obj) {
         final AtomicFile file = new AtomicFile(mPath);
         FileOutputStream str = null;
         try {
@@ -118,7 +118,7 @@ public class Sack<T> {
         }
     }
 
-    private AsyncTask<T, Void, Pair<Status, T>> commit(final T obj, final Listener<T> listener) {
+    public AsyncTask<T, Void, Pair<Status, T>> commit(final T obj, final Listener<T> listener) {
 
         @SuppressLint("StaticFieldLeak") final AsyncTask<T, Void, Pair<Status, T>>  task = new AsyncTask<T, Void, Pair<Status, T>>() {
 
@@ -152,7 +152,7 @@ public class Sack<T> {
         return new Sack<T>(getGson(), entity, path);
     }
 
-    private static Gson getGson() {
+    public static Gson getGson() {
         return new GsonBuilder()
                 .serializeSpecialFloatingPointValues()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
