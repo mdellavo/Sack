@@ -1,10 +1,12 @@
 package org.quuux.sack;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.support.v4.util.AtomicFile;
 import android.util.Pair;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -15,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -33,14 +34,15 @@ public class Sack<T> {
     private final Class<T> mClass;
     private final File mPath;
 
-    private final Gson mGson = new Gson();
+    private final Gson mGson;
 
-    Sack(final Class<T> klass, final File path) {
+    private Sack(final Gson gson, final Class<T> klass, final File path) {
+        mGson = gson;
         mClass = klass;
         mPath = path;
     }
 
-    public Pair<Status, T> doLoad() {
+    private Pair<Status, T> doLoad() {
 
         final AtomicFile file = new AtomicFile(mPath);
         try {
@@ -50,12 +52,11 @@ public class Sack<T> {
             in.close();
             return rv;
         } catch (IOException e) {
-            return new Pair<Status, T>(Status.ERROR, null);
-        } finally {
+            return new Pair<>(Status.ERROR, null);
         }
     }
 
-    public static String slurp(final InputStream is, final int bufferSize) {
+    private static String slurp(final InputStream is, final int bufferSize) {
         final char[] buffer = new char[bufferSize];
         final StringBuilder out = new StringBuilder();
         try  {
@@ -71,9 +72,10 @@ public class Sack<T> {
         }
         return out.toString();
     }
-    public AsyncTask<Void, Void, Pair<Status, T>> load(final Listener<T> listener) {
 
-        final AsyncTask<Void, Void, Pair<Status, T>>  task = new AsyncTask<Void, Void, Pair<Status, T>>() {
+    private AsyncTask<Void, Void, Pair<Status, T>> load(final Listener<T> listener) {
+
+        @SuppressLint("StaticFieldLeak") final AsyncTask<Void, Void, Pair<Status, T>>  task = new AsyncTask<Void, Void, Pair<Status, T>>() {
 
             @Override
             protected Pair<Sack.Status, T> doInBackground(final Void... params) {
@@ -96,7 +98,7 @@ public class Sack<T> {
         return load(null);
     }
 
-    public Pair<Status, T> doCommit(final T obj) {
+    private Pair<Status, T> doCommit(final T obj) {
         final AtomicFile file = new AtomicFile(mPath);
         FileOutputStream str = null;
         try {
@@ -108,20 +110,21 @@ public class Sack<T> {
             str.flush();
             str.close();
             file.finishWrite(str);
-            return new Pair<Status, T>(Status.SUCCESS, obj);
+            return new Pair<>(Status.SUCCESS, obj);
         } catch (IOException e) {
             if (str != null)
                 file.failWrite(str);
-            return new Pair<Status, T>(Status.ERROR, null);
+            return new Pair<>(Status.ERROR, null);
         }
     }
 
-    public AsyncTask<T, Void, Pair<Status, T>> commit(final T obj, final Listener<T> listener) {
+    private AsyncTask<T, Void, Pair<Status, T>> commit(final T obj, final Listener<T> listener) {
 
-        final AsyncTask<T, Void, Pair<Status, T>>  task = new AsyncTask<T, Void, Pair<Status, T>>() {
+        @SuppressLint("StaticFieldLeak") final AsyncTask<T, Void, Pair<Status, T>>  task = new AsyncTask<T, Void, Pair<Status, T>>() {
 
+            @SafeVarargs
             @Override
-            protected Pair<Sack.Status, T> doInBackground(final T... params) {
+            protected final Pair<Sack.Status, T> doInBackground(final T... params) {
                 return doCommit(params[0]);
             }
 
@@ -141,8 +144,18 @@ public class Sack<T> {
         return commit(obj, null);
     }
 
-    public static <T> Sack<T> open(final Class<T> entity, final File path) {
-        return new Sack<T>(entity, path);
+    public static <T> Sack<T> open(final Gson gson, final Class<T> entity, final File path) {
+        return new Sack<T>(gson, entity, path);
     }
 
+    public static <T> Sack<T> open(final Class<T> entity, final File path) {
+        return new Sack<T>(getGson(), entity, path);
+    }
+
+    private static Gson getGson() {
+        return new GsonBuilder()
+                .serializeSpecialFloatingPointValues()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+                .create();
+    }
 }
